@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: CustomerService
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://192.168.99.100:8761/eureka/

@@ -3,15 +3,14 @@ package br.com.alexandreesl.handson.rest;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Named;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-@Named
-@Path("/")
+@RestController
+@RequestMapping("/")
 public class CustomerRest {
 
 	private static List<Customer> clients = new ArrayList<Customer>();
@@ -51,16 +50,13 @@ public class CustomerRest {
 
 	}
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<Customer> getClientes() {
 		return clients;
 	}
 
-	@GET
-	@Path("customer")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Customer getCliente(@QueryParam("id") long id) {
+	@RequestMapping(value = "customer/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public Customer getCliente(@PathVariable long id) {
 
 		Customer cli = null;
 
