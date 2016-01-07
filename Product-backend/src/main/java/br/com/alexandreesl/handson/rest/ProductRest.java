@@ -3,15 +3,14 @@ package br.com.alexandreesl.handson.rest;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Named;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-@Named
-@Path("/")
+@RestController
+@RequestMapping("/")
 public class ProductRest {
 
 	private static List<Product> products = new ArrayList<Product>();
@@ -45,16 +44,13 @@ public class ProductRest {
 
 	}
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<Product> getProdutos() {
 		return products;
 	}
 
-	@GET
-	@Path("product")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Product getProduto(@QueryParam("id") long id) {
+	@RequestMapping(value = "product/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public Product getProduto(@PathVariable long id) {
 
 		Product prod = null;
 
