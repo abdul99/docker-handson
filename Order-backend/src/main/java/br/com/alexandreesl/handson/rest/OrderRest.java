@@ -1,44 +1,63 @@
 package br.com.alexandreesl.handson.rest;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-@Named
-@Path("/")
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.DiscoveryClient;
+
+@RestController
+@RequestMapping("/")
 public class OrderRest {
 
 	private static long id = 1;
 
-	@Inject
+	// Created automatically by Spring Cloud
+	@Autowired
+	@LoadBalanced
 	private RestTemplate restTemplate;
 
-	@GET
-	@Path("order")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Order submitOrder(@QueryParam("idCustomer") long idCustomer,
-			@QueryParam("idProduct") long idProduct,
-			@QueryParam("amount") long amount) {
+	@Autowired
+	private DiscoveryClient discoveryClient;
+
+	@RequestMapping(value = "order/{idCustomer}/{idProduct}/{amount}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public Order submitOrder(@PathVariable long idCustomer, @PathVariable long idProduct, @PathVariable long amount) {
+
+		List<InstanceInfo> instances = discoveryClient.getInstancesById("CUSTOMERSERVICE");
+
+		for (InstanceInfo info : instances) {
+			
+			System.out.println(info.getIPAddr());
+			System.out.println(info.getPort());
+
+		}
 
 		Order order = new Order();
 
-		Customer customer = restTemplate.getForObject(
-				"http://localhost:8081/customer?id={id}", Customer.class,
-				idCustomer);
+		Map map = new HashMap();
 
-		Product product = restTemplate.getForObject(
-				"http://localhost:8082/product?id={id}", Product.class,
-				idProduct);
+		map.put("id", idCustomer);
 
-		order.setCustomer(customer);
+		ResponseEntity<Customer> customer = restTemplate.exchange("http://CUSTOMERSERVICE/customer/{id}",
+				HttpMethod.GET, new HttpEntity(idCustomer), Customer.class, map);
+
+		Product product = restTemplate.getForObject("http://localhost:8082/product?id={id}", Product.class, idProduct);
+
+		order.setCustomer(customer.getBody());
 		order.setProduct(product);
 		order.setId(id);
 		order.setAmount(amount);
