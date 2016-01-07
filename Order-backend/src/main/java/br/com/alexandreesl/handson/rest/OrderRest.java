@@ -2,9 +2,9 @@ package br.com.alexandreesl.handson.rest;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.http.HttpEntity;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.DiscoveryClient;
 
 @RestController
@@ -34,17 +33,10 @@ public class OrderRest {
 	@Autowired
 	private DiscoveryClient discoveryClient;
 
+	private Logger logger = Logger.getLogger(OrderRest.class);
+
 	@RequestMapping(value = "order/{idCustomer}/{idProduct}/{amount}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public Order submitOrder(@PathVariable long idCustomer, @PathVariable long idProduct, @PathVariable long amount) {
-
-		List<InstanceInfo> instances = discoveryClient.getInstancesById("CUSTOMERSERVICE");
-
-		for (InstanceInfo info : instances) {
-			
-			System.out.println(info.getIPAddr());
-			System.out.println(info.getPort());
-
-		}
 
 		Order order = new Order();
 
@@ -55,13 +47,21 @@ public class OrderRest {
 		ResponseEntity<Customer> customer = restTemplate.exchange("http://CUSTOMERSERVICE/customer/{id}",
 				HttpMethod.GET, new HttpEntity(idCustomer), Customer.class, map);
 
-		Product product = restTemplate.getForObject("http://localhost:8082/product?id={id}", Product.class, idProduct);
+		map = new HashMap();
+
+		map.put("id", idProduct);
+
+		ResponseEntity<Product> product = restTemplate.exchange("http://PRODUCTSERVICE/product/{id}", HttpMethod.GET,
+				new HttpEntity(idProduct), Product.class, map);
 
 		order.setCustomer(customer.getBody());
-		order.setProduct(product);
+		order.setProduct(product.getBody());
 		order.setId(id);
 		order.setAmount(amount);
 		order.setOrderDate(new Date());
+
+		logger.warn("The order " + id + " for the client " + customer.getBody().getName() + " with the product "
+				+ product.getBody().getSku() + " with the amount " + amount + " was created!");
 
 		id++;
 
