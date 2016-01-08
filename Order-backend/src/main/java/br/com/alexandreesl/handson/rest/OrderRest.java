@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.netflix.discovery.DiscoveryClient;
-
 @RestController
 @RequestMapping("/")
 public class OrderRest {
@@ -29,9 +27,6 @@ public class OrderRest {
 	@Autowired
 	@LoadBalanced
 	private RestTemplate restTemplate;
-
-	@Autowired
-	private DiscoveryClient discoveryClient;
 
 	private Logger logger = Logger.getLogger(OrderRest.class);
 
