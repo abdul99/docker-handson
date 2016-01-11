@@ -10,7 +10,7 @@ customer1:
   hostname: customer1
   net: "microservicesnet"
   ports:
-   - "8080"
+   - "8080:8080"
   volumes:
    - /Users/alexandrelourenco/Applications/git/docker-handson:/data
   command: -jar /data/Customer-backend/target/Customer-backend-1.0.jar
@@ -20,7 +20,7 @@ product1:
   hostname: product1
   net: "microservicesnet"
   ports:
-   - "8080"
+   - "8081:8080"
   volumes:
    - /Users/alexandrelourenco/Applications/git/docker-handson:/data
   command: -jar /data/Product-backend/target/Product-backend-1.0.jar
@@ -30,7 +30,7 @@ order1:
   hostname: order1
   net: "microservicesnet"
   ports:
-   - "8080"
+   - "8082:8080"
   volumes:
    - /Users/alexandrelourenco/Applications/git/docker-handson:/data
   command: -jar /data/Order-backend/target/Order-backend-1.0.jar
