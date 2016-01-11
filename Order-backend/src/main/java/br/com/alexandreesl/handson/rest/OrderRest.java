@@ -7,7 +7,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,14 +39,14 @@ public class OrderRest {
 		map.put("id", idCustomer);
 
 		ResponseEntity<Customer> customer = restTemplate.exchange("http://CUSTOMERSERVICE/customer/{id}",
-				HttpMethod.GET, new HttpEntity(idCustomer), Customer.class, map);
+				HttpMethod.GET, null, Customer.class, map);
 
 		map = new HashMap();
 
 		map.put("id", idProduct);
 
 		ResponseEntity<Product> product = restTemplate.exchange("http://PRODUCTSERVICE/product/{id}", HttpMethod.GET,
-				new HttpEntity(idProduct), Product.class, map);
+				null, Product.class, map);
 
 		order.setCustomer(customer.getBody());
 		order.setProduct(product.getBody());
